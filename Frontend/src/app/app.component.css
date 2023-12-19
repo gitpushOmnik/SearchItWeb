@@ -1,0 +1,164 @@
+.product-search-form-title{
+    text-align: left;
+}
+
+.nav-pills, .nav-tabs {
+    font-size:12px;
+}
+
+.product-search-form {
+    font-size: 13px;
+}
+
+.table-head-font{
+    font-size:15px;
+}
+
+.google-photos-image-style {
+    padding-bottom: 5px;
+}
+
+.nav-pills .nav-link.active {
+    color: #FFFFFF;
+    background-color: #000000;
+}
+
+.last-viewed-item-active {
+    --bs-table-bg: rgb(167, 167, 167);
+    --bs-table-hover-bg: rgb(167, 167, 167);
+    --bs-table-striped-bg: rgb(167, 167, 167);
+}
+
+.nav-pills .nav-link {
+    color: #000000;
+    background-color: #FFFFFF;
+}
+
+.material-icons.md-12 { 
+    font-size: 12px; 
+}
+
+.page-link {
+    color: #000000;
+}
+
+.modal-body-style {
+    border-color: #000000;
+    border: 3.5px;
+}
+
+.nav-tabs .nav-link.active {
+    color: #FFFFFF;
+    background-color: #000000;
+}
+
+.nav-tabs .nav-link {
+    color: #000000;
+    background-color: #FFFFFF;
+}
+
+.page-item.disabled .page-link{
+    color: #808080
+}
+
+.page-link:hover {
+    text-decoration: underline;
+}
+
+.material-icons.md-15 { 
+    font-size: 15px; 
+}
+
+.page-link.active{
+    color: #FFFFFF;
+}
+
+.facebook-image {
+    height: 36px;
+}
+
+.googlePhotosImage {
+    border: 9px solid #000000;
+}
+
+.wishlisted-icon {
+    color: #FFD700;
+}
+
+.carousel-image {
+    border: 11px solid #000000;
+    width: 350px;
+    height: 350px;
+}
+
+.modal-title-style {
+    color: #000000; 
+    font-size: 13px;
+}
+
+.google-photos-style {
+    padding-right: 3px; 
+    padding-left: 3px
+}
+
+.similarItemsCell {
+    font-size:12px;
+}
+
+.itemFeedbackCircle {
+    position: relative;
+}
+
+.itemFeedbackCircle .itemFeedbackScore {
+    position: absolute;
+    width: 38px;
+    text-align: center;
+    top: 7px;
+    font-size:13px;
+}
+
+.store-link-color {
+    text-decoration: none; 
+    color: #008B8B;
+}
+
+.similarItemsImage {
+    width:144px; 
+    height:144px;
+}
+
+.cell-overflow {
+    overflow-wrap: anywhere;
+}
+
+.carousel-control-prev {
+    width: 25px;
+    margin-left: 4%;
+    background-color: #000000;
+    height: 25px;
+}
+
+.carousel-control-next {
+    width: 25px;
+    margin-right: 4%;
+    background-color: black;
+    height: 25px;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.carousel-previous-next-style {
+    font-weight: bold; 
+    stroke-width: 4px;
+}
+
+@media screen and (max-width: 768px) {
+    td.resizable-table-cell{
+        display: block;
+        text-align: left;
+        width: 100%;
+    }
+}

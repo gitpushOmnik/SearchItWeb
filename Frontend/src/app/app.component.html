@@ -1,0 +1,1272 @@
+<div class="main-container container my-4">
+
+  <div class="product-search-container container col-sm-10 bg-dark rounded-1 text-white mx-auto">
+      
+      <div class="container pt-4 px-3 col-sm-6 mx-auto">
+          <p class="product-search-form-title fs-4 justify-content-start">
+              Product Search
+          </p>
+      </div>
+
+      <form #productSearchForm="ngForm" class="product-search-form form-group col-sm-6 py-3 mx-auto">
+    
+          <div class="row mb-3 px-3">
+              <label for="keywords" class="col-sm-3 col-form-label">
+                  Keyword<span class="text-danger">*</span>
+              </label>
+
+
+              <div class="col-sm-9">
+                  <input #keywordsField="ngModel" 
+                      id="keywords"
+                      name="keywords"
+                      pattern="^(?=.*[a-zA-Z])(?=.*).+$"
+                      [(ngModel)]="keywords"
+                      class="form-control rounded-1" 
+                      [ngClass]="{'border border-danger': ((keywordsField.touched || keywordsField.dirty) && keywordsField.invalid) == true }"
+                      type="text"
+                      placeholder="Enter Product Name (eg. iPhone 8)"
+                      required>
+              
+                  <div class="mb-0 pb-0 pt-1 text-danger small" *ngIf="((keywordsField.touched || keywordsField.dirty) && keywordsField.invalid) == true">
+                      Please enter a keyword.
+                  </div>
+              </div> 
+          </div>
+
+          <div class="row mb-4 px-3">
+              <label for="categoryType" class="col-sm-3 col-form-label">
+                  Category
+              </label>
+
+              <div class="col-sm-9">
+                  <select class="form-select form-select-mb rounded-1" id="categoryType" name="categoryType" [(ngModel)]="categoryType">
+                      <option *ngFor="let categoryType of categoryTypeArray" [ngValue]="categoryType">
+                          {{categoryType}}
+                      </option>
+                  </select>
+              </div>
+          </div>
+    
+          <div class="row mb-4 px-3">
+              <div class="col-sm-3 pb-2">
+                <p class="mb-0">Condition</p>
+                </div>
+
+              <div class="d-flex col-sm-6">
+                  <div class="checkbox me-3">
+                      <input id="newCondition" name="newCondition" [(ngModel)]="newCondition" type="checkbox">
+                      <label class="form-check-label ms-1" for="newCondition">
+                          New
+                      </label>
+                  </div>
+
+                  <div class="checkbox me-3">
+                      <input id="usedCondition" name="usedCondition" [(ngModel)]="usedCondition" type="checkbox">
+                      <label class="form-check-label ms-1" for="usedCondition">
+                          Used
+                      </label>
+                  </div>
+
+                  <div class="checkbox">
+                      <input id="unspecifiedCondition" name="unspecifiedCondition" [(ngModel)]="unspecifiedCondition" type="checkbox">
+                      <label class="form-check-label ms-1" for="unspecifiedCondition">
+                          Unspecified
+                      </label>
+                  </div>
+              </div>
+          </div>
+
+          <div class="row mb-4 px-3">
+              <div class="col-sm-3 pb-2">
+                <p class="mb-0">Shipping Options</p>
+              </div>
+
+              <div class="d-flex col-sm-6">
+                  <div class="checkbox me-3">
+                      <input id="localShipping" name="localShipping" [(ngModel)]="localShipping" type="checkbox">
+                      <label class="form-check-label ms-1" for="localShipping">
+                          Local Pickup
+                      </label>
+                  </div>
+          
+                  <div class="checkbox">
+                      <input id="freeShipping" name="freeShipping" [(ngModel)]="freeShipping" type="checkbox">
+                      <label class="form-check-label ms-1" for="freeShipping">
+                          Free Shipping
+                      </label>
+                  </div>
+              </div>
+          </div>
+
+          <div class="row mb-3 px-3">
+              <label for="distance" class="col-sm-3 col-form-label pt-0 ">
+                  Distance (Miles)
+              </label>
+
+              <div class="col-sm-3">
+                  <input class="form-control rounded-1" id="distance" name="distance" [(ngModel)]="distance" placeholder="10" type="number">
+              </div>
+          </div>
+
+
+          <div class="row mb-3 px-3">
+              <div class="row mb-1">
+                  <label class="col-form-label col-sm-3 pt-0">
+                      From<span class="text-danger">*</span>
+                  </label>
+
+                  <div class="col-sm-7 ps-3">
+                      <input class="form-check-input" id="currentLocationZipcode" name="location" value="currentLocationZipcode" [(ngModel)]="location" type="radio">
+                      <label class="form-check-label ms-2" for="currentLocationZipcode">
+                          'Current Location'
+                      </label>
+
+                      <div class="mt-0 pt-0">
+                          <input class="form-check-input" id="userInputZipcode" name="location" [(ngModel)]="location" value="userInputZipcode" type="radio">
+                          <label class="col-sm-7 form-check-label ms-2" for="userInputZipcode">
+                              Other. Please specify zip code:
+                          </label>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="row">
+                    <div class="col-sm-3"></div>
+                        <div class="col-sm-9">
+                        <input #zipcodeField="ngModel"
+                            class="form-control"
+                            id="zipCode"
+                            name="zipCode"
+                            [(ngModel)]="userInputZipcode"
+                            [ngClass]="{'border border-danger': ((location=='userInputZipcode' || (zipcodeField.touched || zipcodeField.dirty) && zipcodeField.invalid) && userInputZipcode.length < 5) == true}"
+                            [required]="location=='userInputZipcode'"
+                            type="text"
+                            pattern="[0-9]{5}"
+                            [disabled]="location=='currentLocationZipcode'"
+                            (input)="autoSuggestZipcodes($event)"
+                            [matAutocomplete]="auto"
+                        >
+
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <mat-option *ngFor="let zipcode of fetchedZipcodes" [value]="zipcode">
+                            {{zipcode}}
+                            </mat-option>
+                        </mat-autocomplete>
+
+
+                        <div *ngIf="((location=='userInputZipcode' || (zipcodeField.touched || zipcodeField.dirty) && zipcodeField.invalid) && userInputZipcode.length < 5) == true" class="text-danger small">
+                            Please enter a zip code.
+                        </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="row px-3">
+              <div class="col">
+                  <button class="btn btn-light btn-sm me-4 rounded-1" (click)="retrieveSearchResultItems()" [disabled]="productSearchForm.form.invalid">
+                      <i class="material-icons align-top">search</i>Search
+                  </button>
+
+                  <button class="btn btn-light btn-sm rounded-1" (click)="clearProductSearchForm(productSearchForm)">
+                      <i class="material-icons align-top">clear_all</i>Clear
+                  </button>
+              </div>
+          </div>
+      </form>
+  </div>
+
+      <ul class="nav nav-pills d-flex justify-content-center mt-4 mb-3">
+          <li *ngIf="showWishListItems == false" class="nav-item">
+              <button class = "btn btn-sm nav-link bg-black text-white" (click)="toggleResultPills(); resetSortingPreference()">
+                  Results
+              </button>
+          </li>
+          <li *ngIf="showWishListItems != false" class="nav-item">
+            <button class = "btn btn-sm nav-link" (click)="toggleResultPills(); resetSortingPreference()">
+                Results
+            </button>
+          </li>
+          <li *ngIf="showWishListItems == true" class="nav-item">
+            <button class = "btn btn-sm nav-link bg-black text-white" (click)="toggleWishListPills(); retrieveWishListItems(); resetSortingPreference()">
+                Wish List
+            </button>
+         </li>
+
+          <li *ngIf="showWishListItems != true" class="nav-item">
+              <button class = "btn btn-sm nav-link'" (click)="toggleWishListPills(); retrieveWishListItems(); resetSortingPreference()">
+                  Wish List
+              </button>
+          </li>
+      </ul>
+  </div>
+
+
+
+  <div *ngIf="resultsProgressBarLoading == true" class="col-sm-11 mx-auto progress" style="width: 86%">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 50%;"></div>
+  </div>
+
+
+  <div *ngIf="showResultItemDetails == false && showWishListItems == false && showWishListItems == false && resultsProgressBarLoading == false">
+      <div class = "col-sm-10 mx-auto" *ngIf="searchResultItems">
+          
+          <div *ngIf="searchResultItems == null || searchResultItems.length == 0" class="col-sm-12 alert alert-warning mx-auto" style="width:92%">
+            <p class="mb-0">No Records.</p>
+          </div>
+
+          <div *ngIf="searchResultItems != null && searchResultItems.length > 0">
+              
+              <div class="row mb-4">
+                  <div class="d-flex justify-content-end">
+                      <button class="btn btn-light btn-sm" (click)="showResultItemDetails = true;" [disabled]="lastViewedResultItem == null">
+                          Detail <i class="material-icons align-top">chevron_right</i>
+                      </button>
+                  </div>
+              </div>
+
+              <div class="table-responsive px-3">
+                  <table class="table table-dark table-striped table-hover">
+                      <thead>
+                          <tr>
+                              <th style = "white-space: nowrap" class = "table-head-font py-3 ps-3 pe-3">#</th>
+                              <th style = "white-space: nowrap" class = "table-head-font py-3">Image</th>
+                              <th style = "white-space: nowrap" class = "table-head-font py-3">Title</th>
+                              <th style = "white-space: nowrap" class = "table-head-font py-3">Price</th>
+                              <th style = "white-space: nowrap" class = "table-head-font py-3">Shipping</th>
+                              <th style = "white-space: nowrap" class = "table-head-font py-3">Zip</th>
+                              <th style = "white-space: nowrap" class = "table-head-font py-3">Wish List</th>
+                          </tr>
+                      </thead>
+                      
+                      <tbody>
+                          <tr *ngFor="let searchResultItem of searchResultItems | slice: (currentPageNumber-1)*currentPageSize : (currentPageNumber-1)*currentPageSize+currentPageSize" 
+                          [class.last-viewed-item-active]="(lastViewedResultItem != null && lastViewedResultItem.itemID == searchResultItem.itemID) == true">
+                              
+                              <td style = "white-space: nowrap" class="ps-3 pe-3">
+                                  {{searchResultItem.itemSerialNumber}}
+                              </td>
+
+                              <td>
+                                  <a [href]="searchResultItem.itemImageURL" target="blank">
+                                      <img *ngIf="searchResultItem.itemImageURL != undefined" style = "width:100px;height:100px" [src]="searchResultItem.itemImageURL" alt = "Item Image">
+                                      <p *ngIf="searchResultItem.itemImageURL == undefined">N/A</p>
+                                  </a>
+                              </td>
+
+                              <td style = "white-space: nowrap">
+                                  <a (click)="retrieveSearchResultItemDetails(searchResultItem.itemID, searchResultItem.itemIndexNumber)" [matTooltip]="searchResultItem.itemTitle" matTooltipPosition="below" style="text-decoration: none;">
+                                      {{shortenTitle(searchResultItem.itemTitle)}}
+                                  </a>
+                              </td>
+                              
+                              <td style = "white-space: nowrap">
+                                {{searchResultItem.itemPrice}}
+                            </td>
+                              
+                              <td style = "white-space: nowrap">
+                                {{searchResultItem.itemShippingCost}}
+                            </td>
+                              
+                              <td style = "white-space: nowrap">
+                                {{searchResultItem.itemZipcode}}
+                            </td>
+                              
+                              <td>
+                                  <button *ngIf="!wishListItemIDs.includes(searchResultItem.itemID)" class="btn btn-light" (click)="addToWishList(searchResultItem.itemID)">
+                                      <i class="material-icons align-top"> 
+                                          add_shopping_cart
+                                      </i>
+                                  </button>
+
+                                  <button *ngIf="wishListItemIDs.includes(searchResultItem.itemID)" class="btn btn-light" (click)="removeFromWishList(searchResultItem.itemID)">
+                                      <i class="material-icons align-top wishlisted-icon"> 
+                                          remove_shopping_cart
+                                      </i>
+                                  </button>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+
+              <nav class = "pb-2">
+                  <ul class="pagination justify-content-center text-black">
+
+                      <li [ngClass]="currentPageNumber == 1 ? 'page-item disabled': 'page-item'">
+                        <a  class="page-link align-items-center" (click)="navigateToPreviousPage()">
+                            <i class="material-icons md-12">keyboard_double_arrow_left</i>  Previous
+                        </a>
+                      </li>
+
+                      <li *ngFor="let pageNumber of pageNumbersArray">
+                          <div *ngIf="pageNumber <= totalPages">
+                              <div>
+                                  <a class="page-link d-flex align-items-center" [ngClass]="currentPageNumber == pageNumber ? 'active': ''" (click)="navigatePageNumber( pageNumber )">
+                                      {{pageNumber}}
+                                  </a>
+                              </div>
+                          </div>
+                      </li>
+
+                      <li [ngClass]="currentPageNumber == totalPages ? 'page-item disabled': 'page-item'">
+                        <a class="page-link align-items-center" (click)="navigateToNextPage()">
+                            Next  <i class="material-icons md-12">keyboard_double_arrow_right</i>
+                        </a>
+                      </li>
+                  </ul>
+              </nav>
+          </div>
+      </div>
+  </div>
+
+
+  <div *ngIf="showResultItemDetails == true && showWishListItems == false && showWishListItems == false && lastViewedResultItem != null">
+
+      <div class = "col-sm-10 mx-auto">
+
+          <div class="text-center my-4">
+              <span>
+                  <p class="h6 font-weight-bold">
+                      {{lastViewedResultItem.itemTitle}}
+                  </p>
+              </span>
+          </div>
+
+          <div class="row">
+              <div class="col-6 d-flex justify-content-start">
+                  <button class="btn btn-light" (click)="showResultItemDetails = false; resetSortingPreference()">
+                      <i class="material-icons align-bottom">chevron_left</i> List
+                  </button>
+              </div>
+
+              <div class="col-6 d-flex justify-content-end">
+                  <a target="_blank" [href]="'https://www.facebook.com/sharer/sharer.php?u=' + lastViewedResultItem.itemURL" >
+                      <img class = "facebook-image" src="../assets/facebook.png" alt="Share on Facebook">
+                  </a>
+
+                  <button *ngIf="!wishListItemIDs.includes(lastViewedResultItem.itemID)"
+                      class="btn btn-light" 
+                      (click)="addToWishList(lastViewedResultItem.itemID)">
+                          
+                      <i class="material-icons align-top"> 
+                          add_shopping_cart
+                      </i>
+                  </button>
+                                      
+                  <button *ngIf="wishListItemIDs.includes(lastViewedResultItem.itemID)" 
+                      class="btn btn-light"
+                      (click)="removeFromWishList(lastViewedResultItem.itemID)">
+                                          
+                      <i class="wishlisted-icon material-icons align-top"> 
+                          remove_shopping_cart
+                      </i>
+                  </button>
+              </div>
+          </div>
+      
+          <div class="container px-0">
+
+             <ul role="tablist" class="nav nav-tabs justify-content-end border-bottom-0 pb-0">
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link active" data-bs-target="#product" data-bs-toggle="tab">
+                          Product
+                      </button>
+                  </li>
+
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link" data-bs-target="#photos" data-bs-toggle="tab">
+                          Photos
+                      </button>
+                  </li>
+
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link" data-bs-target="#shipping" data-bs-toggle="tab">
+                          Shipping
+                      </button>
+                  </li>
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link" data-bs-target="#seller" data-bs-toggle="tab">
+                          Seller
+                      </button>
+                  </li>
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link" data-bs-target="#similarProducts" data-bs-toggle="tab">
+                          Similar Products
+                      </button>
+                  </li>
+              </ul>
+
+              <hr class="my-0">
+
+              <div class="tab-content mt-3 px-0">
+
+                  <div id="product" class="tab-pane px-0 active">
+                      <div class="table-responsive">
+                          <table class="table table-dark table-striped ">
+                              <tbody>
+                                  
+                                  <tr>
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 ps-3 py-3">
+                                          <b>Product Images</b>
+                                      </td>
+                                  
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          <a href="#" data-bs-target="#productImagesModal" data-bs-toggle="modal" style="text-decoration: none; color: darkcyan;">
+                                              View Product Images Here
+                                          </a>
+
+                                          <div class="modal fade" id="productImagesModal" tabindex="-1">
+                                              <div class="modal-dialog">
+                                                  <div class="modal-content">
+                                                      <div class="modal-header pt-3 pb-4">
+                                                          <p class="modal-title modal-title-style">Product Images</p>
+                                                          <button class="btn btn-sm" data-bs-dismiss="modal">
+                                                            <i style="color: #a9a9a9; font-weight:bold;" class="material-icons md-15">close</i>
+                                                          </button>
+                                                      </div>
+
+                                                      <div class="modal-body py-3 px-4">
+                                                          <div class="modal-body-style">
+                                                              <div id="imageCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                                                                  <div class="carousel-inner">
+                                                                      <div *ngFor="let itemImages of lastViewedResultItem.itemImageURL; index as itemIndex" 
+                                                                          class="carousel-item"     
+                                                                          [ngClass]="{'active': itemIndex == 0}">
+
+                                                                          <a href="{{itemImages}}" target="_blank">
+                                                                              <img src="{{itemImages}}" style="border-radius: 0.275rem;" class="d-block w-100 carousel-image" alt="Item Image">
+                                                                          </a>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  <button class="carousel-control-prev" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                                                                    <span class="material-icons carousel-previous-next-style" aria-hidden="true">chevron_left</span>
+                                                                  </button>
+
+                                                                  <button class="carousel-control-next" data-bs-target="#imageCarousel" data-bs-slide="next">
+                                                                    <span class="material-icons carousel-previous-next-style" aria-hidden="true">chevron_right</span>
+                                                                  </button>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+
+                                                      <div class="modal-footer text-right">
+                                                          <button class="btn btn-dark close" data-bs-dismiss="modal">Close</button>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemPrice != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Price</b>
+                                      </td>
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{lastViewedResultItem.itemPrice}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemLocation != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Location</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{lastViewedResultItem.itemLocation}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemReturnPolicy != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Return Policy</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{lastViewedResultItem.itemReturnPolicy}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngFor="let specific of lastViewedResultItem.itemSpecifics">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>{{specific.Name}}</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{specific.Value}}
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>    
+                  </div>
+
+                  <div id="photos" class="tab-pane px-0">
+                      <div class="row px-2">
+                          <div class="col-sm-4 google-photos-style" *ngFor="let colIndex of [0, 1, 2]">
+                              <div class="google-photos-image-style" *ngFor="let googlePhotosImageURL of lastViewedResultItem.itemGooglePhotos[colIndex]">
+                                  <a target="_blank" [href]="googlePhotosImageURL" >
+                                      <img [src]="googlePhotosImageURL" class="googlePhotosImage img-fluid" alt = "Image Photo">
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div id="shipping" class="tab-pane px-0">  
+                      <div class="table-responsive">
+                          <table class="table table-dark table-striped ">
+                              <tbody>
+                                  <tr *ngIf="lastViewedResultItem.itemShippingCost != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Shipping Cost</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{lastViewedResultItem.itemShippingCost}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemShippingLocations != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Shipping Locations</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{lastViewedResultItem.itemShippingLocations}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemHandlingTime != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Handling Time</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{lastViewedResultItem.itemHandlingTime}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemExpeditedShipping != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Expedited Shipping</b>
+                                      </td>
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          <i class = "material-icons" 
+                                          [ngClass]="{  'text-danger': lastViewedResultItem.itemExpeditedShipping == 'false',
+                                                        'text-success': lastViewedResultItem.itemExpeditedShipping == 'true'}">
+                                              {{lastViewedResultItem.itemExpeditedShipping == "false" ? 'close' : 'check' }}
+                                          </i>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemOneDayShipping != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>One Day Shipping</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          <i class="material-icons" 
+                                          [ngClass]="{  'text-danger': lastViewedResultItem.itemOneDayShipping == 'false',
+                                                        'text-success': lastViewedResultItem.itemOneDayShipping == 'true'}"> 
+                                              {{lastViewedResultItem.itemOneDayShipping == "false" ? 'close' : 'check' }}
+                                          </i>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemReturnsAccepted != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Return Accepted</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          <i class = "material-icons" 
+                                          [ngClass]="{  'text-danger': lastViewedResultItem.itemReturnsAccepted == 'false',
+                                                        'text-success': lastViewedResultItem.itemReturnsAccepted == 'true'}"> 
+                                              {{lastViewedResultItem.itemReturnsAccepted == "false" ? 'close' : 'check' }}
+                                          </i>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <div id="seller" class="tab-pane px-0">
+                      <div class="table-responsive">
+                          <table class="table table-dark table-striped">
+                              <tbody>
+                                  <tr *ngIf="lastViewedResultItem.itemSellerName != undefined">
+                                      <td colspan="2" class="cell-overflow text-center pt-3 pb-4">
+                                          {{lastViewedResultItem.itemSellerName | uppercase}}
+                                      </td>
+                                  </tr>
+                                  
+                                  <tr *ngIf="lastViewedResultItem.itemFeedbackRatingScore != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Feedback Score</b>
+                                      </td>
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{lastViewedResultItem.itemFeedbackRatingScore}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemPositiveFeedbackRatingPercentage != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Popularity</b>
+                                      </td>
+
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3">
+                                          <div class="itemFeedbackCircle">
+                                              <round-progress
+                                                  [max]='100'
+                                                  [background]='"#FFFFFF"'
+                                                  [current]="lastViewedResultItem.itemPositiveFeedbackRatingPercentage"
+                                                  [radius]='20'
+                                                  [duration]='2'
+                                                  [clockwise]="false"
+                                                  [color]='"#00FF00"'
+                                                  [stroke]='2'>
+                                              </round-progress>
+                                              <p class="itemFeedbackScore">
+                                                  {{lastViewedResultItem.itemPositiveFeedbackRatingPercentage}}
+                                              </p>
+                                          </div>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemFeedbackRatingStarDesign != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Feedback Rating Star</b>
+                                      </td>
+
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          <i class="material-icons" [ngStyle]="lastViewedResultItem.itemFeedbackRatingStarAlignment">
+                                              {{lastViewedResultItem.itemFeedbackRatingStarDesign}}
+                                          </i>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemTopRated != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Top Rated</b>
+                                      </td>
+
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          <i class = "material-icons" 
+                                          [ngClass]="{  'text-danger': lastViewedResultItem.itemTopRated == false,
+                                                        'text-success': lastViewedResultItem.itemTopRated == true }"> 
+                                              {{ lastViewedResultItem.itemTopRated == false ? 'close' : 'check' }}
+                                          </i>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemStoreName != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Store Name</b>
+                                      </td>
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          {{lastViewedResultItem.itemStoreName}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedResultItem.itemStoreURL != undefined">
+                                      <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                          <b>Buy Product At</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                          <a [href]="lastViewedResultItem.itemStoreURL" target = "_blank" class = "store-link-color">
+                                              Store
+                                          </a>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <div id="similarProducts" class="tab-pane px-0">
+
+                      <div *ngIf="lastViewedResultItem.similarItems == null || lastViewedResultItem.similarItems.length == 0" class="col-sm-12 alert alert-warning mx-auto" style="width:92%">
+                        <p class="mb-0">No Records.</p>
+                      </div>
+
+                      <div *ngIf="lastViewedResultItem.similarItems != null && lastViewedResultItem.similarItems.length != 0" >
+                          <div class="row mt-2 mb-3">
+                              <div class="col-12 col-md-3">
+                                  <select class="form-select form-group mb-0" (change)="performSimilarItemsSorting(displayCriteria, true)" [(ngModel)]="displayCriteria">
+                                      <option value="Default">Default</option>
+                                      <option value="Product Name">Product Name</option>
+                                      <option value="Days Left">Days Left</option>
+                                      <option value="Price">Price</option>
+                                      <option value="Shipping">Shipping Cost</option>
+                                  </select>
+                              </div>
+
+                              <div class="col-12 col-md-3">
+                                  <select class="form-select form-group mb-0" (change)="performSimilarItemsSorting(displayCriteria, true)" [(ngModel)]="sortingPreference" [disabled]="this.displayCriteria=='Default'">
+                                      <option value="Ascending">Ascending</option>
+                                      <option value="Descending">Descending</option>
+                                  </select>
+                              </div>
+                          </div>
+      
+                          <div class="rounded bg-dark rounded-1 mb-2" *ngFor="let similarItem of lastViewedResultItem.similarItems.slice(0, lastViewedResultItem.similarItemsCount)">
+                              <div class="row similarItemsCell m-0">
+                                <div class="col-sm-2 py-1 ps-2">
+                                      <a target="blank" [href]="similarItem.itemImageURL">
+                                          <img *ngIf="similarItem.itemImageURL" class="ps-2 pt-2 pb-2 similarItemsImage" [src]="similarItem.itemImageURL" alt="Item Image"> 
+                                      </a>
+                                  </div>
+                                  
+                                  <div class="col-sm-10 ps-3 pb-3">
+                                      <div class="mt-3">
+                                          <div style="color:#008b8b">
+                                              {{ similarItem.itemTitle }}
+                                          </div>
+                                          <div style="color:#90ee90">
+                                              Price: ${{similarItem.itemPrice}}
+                                          </div>
+                                          <div style="color:#ffa500">
+                                              Shipping Cost: ${{ similarItem.itemShippingCost}}
+                                          </div>
+                                          <div style="color: #FFFFFF">
+                                              Days Left: {{ similarItem.itemDaysLeft }}
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                                  
+                          <div class="text-center" *ngIf="lastViewedResultItem.similarItems.length > 5">
+                            <button class="btn btn-dark" 
+                              *ngIf="lastViewedResultItem.similarItemsCount == 5 && lastViewedResultItem.similarItemsCount != lastViewedResultItem.similarItems.length" 
+                              (click)="lastViewedResultItem.similarItemsCount = lastViewedResultItem.similarItems.length">
+                              Show More
+                            </button>
+                              <button class="btn btn-dark" 
+                              *ngIf="lastViewedResultItem.similarItemsCount > 5" 
+                              (click)="lastViewedResultItem.similarItemsCount = 5">
+                              Show Less
+                            </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+  <div *ngIf="showWishListItemDetails == false && showResultItemDetails == false && showWishListItems == true">
+      <div class = "col-sm-10 mx-auto" *ngIf="wishListItems">
+
+            <div class="row mb-4 ">
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-light btn-sm" (click)="showWishListItemDetails = true" [disabled]="lastViewedWishListItem == null || lastViewedWishListDetailButton == false" >
+                        Detail <i class="material-icons align-top">chevron_right</i>
+                    </button>
+                </div>
+            </div> 
+
+            <div *ngIf="wishListItems == null || wishListItems.length == 0" class="col-sm-12 alert alert-warning mx-auto" style="width:92%">
+                <p class="mb-0">No Records.</p>
+            </div>
+
+          <div *ngIf="wishListItems != null && wishListItems.length > 0">
+
+          <div class="table-responsive px-3">
+              <table class="table table-dark table-striped table-hover">
+                  <thead>
+                      <tr>
+                          <th style = "white-space: nowrap" class = "table-head-font py-3 ps-3 pe-3">#</th>
+                          <th style = "white-space: nowrap" class = "table-head-font py-3">Image</th>
+                          <th style = "white-space: nowrap" class = "table-head-font py-3">Title</th>
+                          <th style = "white-space: nowrap" class = "table-head-font py-3">Price</th>
+                          <th style = "white-space: nowrap" class = "table-head-font py-3">Shipping</th>
+                          <th style = "white-space: nowrap" class = "table-head-font py-3">Wish List</th>
+                      </tr>
+                  </thead>
+
+                  <tbody>
+                      <tr *ngFor="let wishListItem of wishListItems"
+                      [class.last-viewed-item-active]="(lastViewedWishListItem != null && lastViewedWishListItem.itemID == wishListItem.itemID) == true">
+                          
+                          <td style = "white-space: nowrap" class="ps-3 pe-3">
+                              {{wishListItem.itemSerialNumber}}
+                          </td>
+                          
+                          <td>
+                              <a [href]="wishListItem.itemImageURL" target="blank">    
+                                  <img *ngIf="wishListItem.itemImageURL != undefined" style = "width:100px;height:100px" [src]="wishListItem.itemImageURL" alt = "Item Image">
+                                  <p *ngIf="wishListItem.itemImageURL == undefined">N/A</p>
+                              </a>
+                          </td>
+
+                          <td style = "white-space: nowrap">
+                              <a (click)="retrieveWishListItemDetails(wishListItem.itemID, wishListItem.itemIndexNumber)" [matTooltip]="wishListItem.itemTitle" matTooltipPosition="below" style="text-decoration: none;">
+                                  {{shortenTitle(wishListItem.itemTitle)}}
+                              </a>
+                          </td>
+                          
+                          <td style = "white-space: nowrap">
+                            {{wishListItem.itemPrice}}
+                            </td>
+
+                          <td style = "white-space: nowrap">
+                            {{wishListItem.itemShippingCost}}
+                          </td>
+
+                          <td>
+                              <button class="btn btn-light" (click)="removeFromWishList(wishListItem.itemID)">
+                                  <i class="material-icons align-top wishlisted-icon"> 
+                                      remove_shopping_cart
+                                  </i>
+                              </button>
+                          </td>
+                      </tr>
+              
+                      <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style = "white-space: nowrap">
+                                <b>Total Shopping</b>
+                            </td>
+                            <td style = "white-space: nowrap">
+                              <b>{{totalShoppingCost | currency:'USD':'symbol-narrow':'1.2-2' }}</b>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+  <div *ngIf="showWishListItemDetails == true && showWishListItems == true && showResultItemDetails == false && lastViewedWishListItem != null">
+
+      <div class = "col-sm-10 mx-auto">
+
+          <div class="text-center my-4">
+              <span>
+                  <p class="h6 font-weight-bold">
+                      {{lastViewedWishListItem.itemTitle}}
+                  </p>
+              </span>
+          </div>
+
+          <div class="row">
+              <div class="col-6 d-flex justify-content-start">
+                  <button class="btn btn-light" (click)="showWishListItemDetails = false; resetSortingPreference()">
+                      <i class="material-icons align-bottom">chevron_left</i> List
+                  </button>
+              </div>
+              <div class="col-6 d-flex justify-content-end">
+                  <a  target="_blank" [href]="'https://www.facebook.com/sharer/sharer.php?u=' + lastViewedWishListItem.itemURL">
+                      <img class = "facebook-image" src="../assets/facebook.png" alt="Share on Facebook">
+                  </a>
+
+                  <button *ngIf="!wishListItemIDs.includes(lastViewedWishListItem.itemID)" 
+                      class="btn btn-light" 
+                      (click)="addToWishList(lastViewedWishListItem.itemID)" 
+                      [disabled]="lastViewedWishListDetailButton == false">
+                      
+                      <i class="material-icons align-top"> 
+                          add_shopping_cart
+                      </i>
+                  </button>
+
+                  <button *ngIf="wishListItemIDs.includes(lastViewedWishListItem.itemID)" 
+                      class="btn btn-light" 
+                      (click)="removeFromWishList(lastViewedWishListItem.itemID, true)">
+                      
+                      <i class="material-icons align-top wishlisted-icon"> 
+                          remove_shopping_cart
+                      </i>
+                  </button>
+              </div>
+          </div>
+      
+
+          <div class="container px-0">
+
+              <ul role="tablist" class="nav nav-tabs justify-content-end border-bottom-0 pb-0">
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link active" data-bs-target="#productWishList" data-bs-toggle="tab">
+                          Product
+                      </button>
+                  </li>
+
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link" data-bs-target="#photosWishList" data-bs-toggle="tab">
+                          Photos
+                      </button>
+                  </li>
+
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link" data-bs-target="#shippingWishList" data-bs-toggle="tab">
+                          Shipping
+                      </button>
+                  </li>
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link" data-bs-target="#sellerWishList" data-bs-toggle="tab">
+                          Seller
+                      </button>
+                  </li>
+                  <li class="nav-item">
+                      <button class = "btn btn-sm nav-link" data-bs-target="#similarProductsWishList" data-bs-toggle="tab">
+                          Similar Products
+                      </button>
+                  </li>
+              </ul>
+
+              <hr class="my-0">
+
+              <div class="tab-content mt-3 px-0">
+
+                  <div id="productWishList" class="tab-pane px-0 active">
+                      <div class="table-responsive">
+                          <table class="table table-dark table-striped">
+                              <tbody>
+
+                                  <tr>
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 ps-3 py-3">
+                                        <b>Product Images</b>
+                                      </td>
+
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        <a href="#" data-bs-target="#productImagesModalWishList" data-bs-toggle="modal" style="text-decoration: none; color:darkcyan;">
+                                              View Product Images Here
+                                          </a>
+                                          <div class="modal fade" id="productImagesModalWishList" tabindex="-1">
+                                              <div class="modal-dialog">
+                                                  <div class="modal-content">
+                                                    <div class="modal-header pt-3 pb-4">
+                                                        <p class="modal-title modal-title-style">Product Images</p>
+                                                        <button class="btn btn-sm" data-bs-dismiss="modal">
+                                                            <i style="color: #a9a9a9; font-weight:bold;" class="material-icons md-15">close</i>
+                                                          </button>
+                                                      </div>
+
+                                                      <div class="modal-body py-3 px-4">
+                                                          <div class="modal-body-style">
+                                                              <div id="imageCarouselWishList" class="carousel slide" data-ride="carousel" data-interval="false">
+                                                                  <div class="carousel-inner">
+                                                                      <div *ngFor="let itemImage of lastViewedWishListItem.itemImageURL ; index as itemIndex" 
+                                                                          class="carousel-item" 
+                                                                          [ngClass]="{'active': itemIndex == 0}" >
+                                                                          
+                                                                          <a href="{{itemImage}}" target="_blank">
+                                                                              <img src="{{itemImage}}" style="border-radius: 0.275rem;" class="d-block w-100 carousel-image" alt="Item Image">
+                                                                          </a>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  <button class="carousel-control-prev" data-bs-target="#imageCarouselWishList" data-bs-slide="prev">
+                                                                    <span class="material-icons carousel-previous-next-style" aria-hidden="true">chevron_left</span>
+                                                                  </button>
+
+                                                                  <button class="carousel-control-next" data-bs-target="#imageCarouselWishList" data-bs-slide="next">
+                                                                    <span class="material-icons carousel-previous-next-style" aria-hidden="true">chevron_right</span>
+                                                                  </button>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+
+                                                      <div class="modal-footer text-right">
+                                                          <button class="btn btn-dark close" data-bs-dismiss="modal">Close</button>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemPrice != undefined">
+                                    <td class="resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Price</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{lastViewedWishListItem.itemPrice}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemLocation != undefined">
+                                    <td class="resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Location</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{lastViewedWishListItem.itemLocation}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemReturnPolicy != undefined">
+                                    <td class="resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Return Policy</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{lastViewedWishListItem.itemReturnPolicy}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngFor="let specific of lastViewedWishListItem.itemSpecifics">
+                                    <td class="resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>{{specific.Name}}</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{specific.Value}}
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <div id="photosWishList" class="tab-pane px-0">
+                      <div class="row px-2">
+                          <div class="col-sm-4 google-photos-style" *ngFor="let colIndex of [0, 1, 2]">
+                              <div class="google-photos-image-style" *ngFor="let googlePhotosImageURL of lastViewedWishListItem.itemGooglePhotos[colIndex]">
+                                  <a [href]="googlePhotosImageURL" target="_blank">
+                                      <img [src]="googlePhotosImageURL" class="googlePhotosImage img-fluid" alt = "Image Photo">
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div id="shippingWishList" class="tab-pane px-0">
+                      <div class="table-responsive">
+                          <table class="table table-dark table-striped">
+                              <tbody>
+                                  <tr *ngIf="lastViewedWishListItem.itemShippingCost != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Shipping Cost</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{ lastViewedWishListItem.itemShippingCost }}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemShippingLocations != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Shipping Locations</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{lastViewedWishListItem.itemShippingLocations }}
+                                      </td>
+                                  </tr>
+                              
+                                  <tr *ngIf="lastViewedWishListItem.itemHandlingTime != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Handling Time</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{lastViewedWishListItem.itemHandlingTime}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemExpeditedShipping != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Expedited Shipping</b>
+                                      </td>
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        <i class = "material-icons" 
+                                          [ngClass]="{  'text-danger': lastViewedWishListItem.itemExpeditedShipping == 'false',
+                                                        'text-success': lastViewedWishListItem.itemExpeditedShipping == 'true'}">
+                                              {{lastViewedWishListItem.itemExpeditedShipping == "false" ? 'close' : 'check' }}
+                                          </i>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemOneDayShipping != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>One Day Shipping</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        <i class="material-icons" 
+                                          [ngClass]="{  'text-danger': lastViewedWishListItem.itemOneDayShipping == 'false',
+                                                        'text-success': lastViewedWishListItem.itemOneDayShipping == 'true'}"> 
+                                              {{lastViewedWishListItem.itemOneDayShipping == "false" ? 'close' : 'check' }}
+                                          </i>
+                                      </td>                                    
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemReturnsAccepted != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Return Accepted</b>
+                                      </td>                                        
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        <i class = "material-icons" 
+                                          [ngClass]="{  'text-danger': lastViewedWishListItem.itemReturnsAccepted == 'false',
+                                                        'text-success': lastViewedWishListItem.itemReturnsAccepted == 'true'}"> 
+                                              {{lastViewedWishListItem.itemReturnsAccepted == "false" ? 'close' : 'check' }}
+                                          </i>
+                                      </td>                                    
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <div id="sellerWishList" class="tab-pane px-0">
+                      <div class="table-responsive">
+                          <table class="table table-dark table-striped">
+                              <tbody>
+                                  <tr *ngIf="lastViewedWishListItem.itemSellerName != undefined">
+                                      <td colspan="2" class="cell-overflow text-center pt-3 pb-4">
+                                          {{lastViewedWishListItem.itemSellerName | uppercase}}
+                                      </td>
+                                  </tr>
+                                  
+                                  <tr *ngIf="lastViewedWishListItem.itemFeedbackRatingScore != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Feedback Score</b>
+                                      </td>
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{lastViewedWishListItem.itemFeedbackRatingScore}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemPositiveFeedbackRatingPercentage != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Popularity</b>
+                                      </td>
+
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3">
+                                        <div class="itemFeedbackCircle">
+                                            <round-progress
+                                                [max]='100'
+                                                [background]='"#FFFFFF"'
+                                                [current]="lastViewedWishListItem.itemPositiveFeedbackRatingPercentage"
+                                                [radius]='20'
+                                                [duration]='2'
+                                                [clockwise]="false"
+                                                [color]='"#00FF00"'
+                                                [stroke]='2'>
+                                            </round-progress>
+                                              <p class="itemFeedbackScore">
+                                                  {{lastViewedWishListItem.itemPositiveFeedbackRatingPercentage}}
+                                              </p>
+                                          </div>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemFeedbackRatingStarDesign != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Feedback Rating Star</b>
+                                      </td>
+
+                                      <td class="cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        <i class="material-icons" [ngStyle]="lastViewedWishListItem.itemFeedbackRatingStarAlignment">
+                                              {{lastViewedWishListItem.itemFeedbackRatingStarDesign}}
+                                          </i>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemTopRated != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Top Rated</b>
+                                      </td>
+
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        <i class = "material-icons" 
+                                          [ngClass]="{  'text-danger': lastViewedWishListItem.itemTopRated == false,
+                                                        'text-success': lastViewedWishListItem.itemTopRated == true }"> 
+                                              {{ lastViewedWishListItem.itemTopRated == false ? 'close' : 'check' }}
+                                          </i>
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemStoreName != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Store Name</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        {{lastViewedWishListItem.itemStoreName}}
+                                      </td>
+                                  </tr>
+
+                                  <tr *ngIf="lastViewedWishListItem.itemStoreURL != undefined">
+                                    <td class="cell-overflow resizable-table-cell col-sm-4 py-3 ps-3">
+                                        <b>Buy Product At</b>
+                                      </td>
+                                      <td class = "cell-overflow col-sm-8 resizable-table-cell py-3 ps-3">
+                                        <a [href]="lastViewedWishListItem.itemStoreURL" target = "_blank" class = "store-link-color">
+                                              Store
+                                          </a>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <div id="similarProductsWishList" class="tab-pane px-0">
+
+                      <div *ngIf="lastViewedWishListItem.similarItems == null || lastViewedWishListItem.similarItems.length == 0" class="col-sm-12 alert alert-warning mx-auto" style="width:92%">
+                        <p class="mb-0">No Records.</p>
+                      </div>
+
+                      <div *ngIf="lastViewedWishListItem.similarItems != null && lastViewedWishListItem.similarItems.length != 0" >
+                          <div class="row mt-2 mb-3">
+                            <div class="col-12 col-md-3">
+                                <select class="form-select form-group mb-0" (change)="performSimilarItemsSorting(displayCriteria, false)" [(ngModel)]="displayCriteria">
+                                      <option value="Default">Default</option>
+                                      <option value="Product Name">Product Name</option>
+                                      <option value="Days Left">Days Left</option>
+                                      <option value="Price">Price</option>
+                                      <option value="Shipping Cost">Shipping Cost</option>
+                                  </select>
+                              </div>
+      
+                              <div class="col-12 col-md-3">
+                                <select class="form-select form-group mb-0" (change)="performSimilarItemsSorting(displayCriteria, false)" [(ngModel)]="sortingPreference" [disabled]="this.displayCriteria=='Default'">
+                                      <option value="Ascending">Ascending</option>
+                                      <option value="Descending">Descending</option>
+                                  </select>
+                              </div>
+                          </div>
+      
+                          <div class="rounded bg-dark rounded-1 mb-2" *ngFor="let similarItem of lastViewedWishListItem.similarItems.slice(0, lastViewedWishListItem.similarItemsCount)">
+                            <div class="row similarItemsCell m-0">
+                              <div class="col-sm-2 py-1 ps-2">
+                                    <a target="blank" [href]="similarItem.itemImageURL">
+                                        <img *ngIf="similarItem.itemImageURL" class="ps-2 pt-2 pb-2 similarItemsImage" [src]="similarItem.itemImageURL" alt="Item Image"> 
+                                    </a>
+                                </div>
+                                
+                                <div class="col-sm-10 ps-3 pb-3">
+                                    <div class="mt-3">
+                                        <div style="color:darkcyan">
+                                            {{ similarItem.itemTitle }}
+                                        </div>
+                                        <div style="color:lightgreen">
+                                            Price: ${{similarItem.itemPrice}}
+                                        </div>
+                                        <div style="color:orange">
+                                            Shipping Cost: ${{ similarItem.itemShippingCost}}
+                                        </div>
+                                        <div class="text-white">
+                                            Days Left: {{ similarItem.itemDaysLeft }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                  
+                          <div class="text-center" *ngIf="lastViewedWishListItem.similarItems.length > 5">
+                            <button class="btn btn-dark" 
+                              *ngIf="lastViewedWishListItem.similarItemsCount == 5 && lastViewedWishListItem.similarItemsCount != lastViewedWishListItem.similarItems.length" 
+                              (click)="lastViewedWishListItem.similarItemsCount = lastViewedWishListItem.similarItems.length">
+                              Show More
+                            </button>
+                              <button class="btn btn-dark" 
+                              *ngIf="lastViewedWishListItem.similarItemsCount > 5" 
+                              (click)="lastViewedWishListItem.similarItemsCount = 5">
+                              Show Less
+                            </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
